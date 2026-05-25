@@ -1,148 +1,123 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>FastOrder</title>
+    <title>FastOrder</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
-
-    <div class="login-box">
-
+    <div class="login-box text-center">
         <h1>🍔 FastOrder</h1>
 
-        <button
-        class="btn btn-warning w-100 mb-3"
-        onclick="entrarCliente()">
+        <div id="loginOptions">
+            <button class="btn btn-warning w-100 mb-3" onclick="entrarCliente()">
+                Sou Cliente
+            </button>
 
-        Sou Cliente
+            <button class="btn btn-secondary w-100" onclick="mostrarFormFuncionario()">
+                Sou Funcionário
+            </button>
+        </div>
 
-        </button>
+        <div id="funcForm" class="hidden mt-3">
+            <h3 class="text-warning mb-3">Painel do Chef</h3>
+            <div class="mb-2">
+                <input type="email" id="loginEmail" class="form-control" placeholder="E-mail do funcionário">
+            </div>
+            <div class="mb-3">
+                <input type="password" id="loginSenha" class="form-control" placeholder="Senha">
+            </div>
+            
+            <button class="btn btn-success w-100 mb-2" onclick="entrarFuncionarioReal()">
+                Entrar
+            </button>
+            <button class="btn btn-sm btn-link text-light" onclick="cancelarLoginFunc()">
+                Voltar
+            </button>
+        </div>
+    </div>
+</div>
 
-        <button
-        class="btn btn-secondary w-100"
-        onclick="entrarFuncionario()">
+<div id="menuScreen" class="hidden">
+    <nav class="navbar navbar-dark px-4">
+        <div class="d-flex justify-content-between w-100">
+            <h3>🍔 Cardápio Digital</h3>
+            <button class="btn btn-light" onclick="voltarInicio()">🏠</button>
+        </div>
+    </nav>
 
-        Sou Funcionário
-
-        </button>
-
+    <div class="container mt-5">
+        <div class="row" id="foods"></div>
     </div>
 
+    <div class="cart">
+        <h4>🛒 Pedido</h4>
+        <ul id="cartItems"></ul>
+        <h5>Total: R$ <span id="total">0</span></h5>
+
+        <input type="text" id="nomeCliente" class="form-control mt-3" placeholder="Seu nome">
+
+        <select id="pagamento" class="form-select mt-2">
+            <option value="" selected disabled>💳 Forma de pagamento</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão">Cartão</option>
+        </select>
+
+        <button class="btn btn-order w-100 mt-3" onclick="finalizarPedido()">
+            Finalizar Pedido
+        </button>
+    </div>
 </div>
 
-<!-- CLIENTE -->
-<div id="menuScreen" class="hidden">
-
-<nav class="navbar navbar-dark px-4">
-
-<div class="d-flex justify-content-between w-100">
-
-<h3>🍔 Cardápio Digital</h3>
-
-<button
-class="btn btn-light"
-onclick="voltarInicio()">
-
-🏠
-
-</button>
-
-</div>
-
-</nav>
-
-<div class="container mt-5">
-<div class="row" id="foods"></div>
-</div>
-
-<div class="cart">
-
-<h4>🛒 Pedido</h4>
-
-<ul id="cartItems"></ul>
-
-<h5>Total: R$ <span id="total">0</span></h5>
-
-<input
-type="text"
-id="nomeCliente"
-class="form-control mt-3"
-placeholder="Seu nome">
-
-<select
-id="pagamento"
-class="form-select mt-2">
-
-<option value="" selected disabled>
-💳 Forma de pagamento
-</option>
-
-<option value="Pix">
-Pix
-</option>
-
-<option value="Dinheiro">
-Dinheiro
-</option>
-
-<option value="Cartão">
-Cartão
-</option>
-
-</select>
-
-<button
-class="btn btn-order w-100 mt-3"
-onclick="finalizarPedido()">
-
-Finalizar Pedido
-
-</button>
-
-</div>
-
-</div>
-
-<!-- FUNCIONARIO -->
 <div id="funcionarioScreen" class="hidden">
+    <nav class="navbar navbar-dark px-4 mb-4">
+        <div class="d-flex justify-content-between w-100 align-items-center">
+            <h3>👨‍🍳 Painel Administrativo</h3>
+            <button class="btn btn-light" onclick="voltarInicio()">🏠 Sair</button>
+        </div>
+    </nav>
 
-<nav class="navbar navbar-dark px-4">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <div class="btn-group w-100" role="group">
+                    <button id="btnAbaPedidos" class="btn btn-warning active" onclick="alternarModuloFuncionario('pedidos')">
+                        <i class="fas fa-shopping-basket me-2"></i>Gestão de Pedidos
+                    </button>
+                    <button id="btnAbaProdutos" class="btn btn-outline-warning" onclick="alternarModuloFuncionario('produtos')">
+                        <i class="fas fa-hamburger me-2"></i>Gestão de Produtos
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<div class="d-flex justify-content-between w-100">
+        <div id="moduloPedidos">
+            <div id="listaPedidos"></div>
+        </div>
 
-<h3>👨‍🍳 Painel Funcionário</h3>
-
-<button
-class="btn btn-light"
-onclick="voltarInicio()">
-
-🏠
-
-</button>
-
-</div>
-
-</nav>
-
-<div class="container mt-5">
-
-<div id="listaPedidos"></div>
-
-</div>
-
+        <div id="moduloProdutos" class="hidden">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-warning mb-0">🍔 Itens do Cardápio</h2>
+                <button class="btn btn-success" onclick="abrirModalCriarProduto()">
+                    <i class="fas fa-plus me-2"></i>Novo Produto
+                </button>
+            </div>
+            
+            <div class="row" id="listaProdutosGestao"></div>
+        </div>
+    </div>
 </div>
 
 <script src="js/script.js"></script>
